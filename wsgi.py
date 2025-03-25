@@ -9,5 +9,10 @@ if path not in sys.path:
 # Set the working directory
 os.chdir(path)
 
+# Print debugging information
+print("Python path:", sys.path)
+print("Current working directory:", os.getcwd())
+print("Files in current directory:", os.listdir())
+
 # Import the Flask application
 from app import app as application 
