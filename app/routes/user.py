@@ -23,6 +23,8 @@ def root():
     - get: Redirects guests to the login page, and redirects logged-in users to
         their own role-specific homepage.
     """
+    if not session.get(constants.SESSION_LOGGED_IN):
+        return redirect(url_for('login'))
     return redirect(user_home_url())
 
 def user_home_url():

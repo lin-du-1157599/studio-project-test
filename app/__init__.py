@@ -1,14 +1,14 @@
 # This script runs automatically when our `app` module is first loaded,
 # and handles all the setup for our Flask app.
-from flask import Flask
+from flask import Flask, redirect, url_for
 import os
 
 app = Flask(__name__)
 
 # Set up database connection.
-from app.db import connect
-from app.db import db
-db.init_db(app, connect.dbuser, connect.dbpass, connect.dbhost, connect.dbname)
+from app.db.connect import dbuser, dbpass, dbhost, dbname
+from app.db.db import init_db
+init_db(app, dbuser, dbpass, dbhost, dbname)
 
 # Add multiple template search paths to Jinja2 template loader.
 # This allows Flask to locate templates stored in different subdirectories under 'templates'.
@@ -32,6 +32,7 @@ app.jinja_loader.searchpath.append(os.path.join(app.root_path, 'templates', 'eve
 app.secret_key = 'Example Secret Key (CHANGE THIS TO YOUR OWN SECRET KEY!)'
 
 # Configure upload folder for event images
+from app.config import constants
 app.config[constants.IMAGE_UPLOAD_FOLDER] = os.path.join(app.root_path, 'static', 'uploads')
 os.makedirs(app.config[constants.IMAGE_UPLOAD_FOLDER], exist_ok=True)
 
@@ -47,4 +48,8 @@ from app.routes import admin
 from app.routes import editor
 from app.routes import traveller
 from app.routes import event
-from app.config import constants
+
+# Add a root route
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
