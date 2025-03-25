@@ -1,0 +1,136 @@
+{% extends 'userbase.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{# Set the active page to be highlighted in the navigation bar. #}
+{% set active_page = 'profile' %}
+
+{% block content %}
+
+<section class="container py-2">
+    <!-- Page title -->
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-7 px-4 py-2">
+            <h1>{{ profile.role.title() }} Profile</h1>
+            <p class="lead text-muted">Here's everything we know about you.</p>
+        </div>
+    </div>
+
+    <!-- Image -->
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-4 my-3 justify-content-center">
+            {% if profile.profile_image %}
+                <div class="position-relative mb-4 mx-auto align-items-center" style="width: 180px; height: 180px; overflow: hidden;">
+                    <img src="/static/uploads/{{ profile.profile_image }}" class="img-fluid img-thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x text-gray text-center w-100 py-1">
+                        <a href="{{ url_for('preview_avatar', username=session['username']) }}" class="btn">Preview</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="position-relative">
+                    <div class="mb-4 mx-auto align-items-center bg-secondary" style="width: 180px; height: 180px; overflow: hidden; border-radius: 10px;">
+                        <div class="position-relative d-flex justify-content-center align-items-center bg-secondary" style="width: 180px; height: 180px; overflow: hidden; border-radius: 10px;">
+                            <span class="text-white">No Avatar</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Image upload and remove -->
+            <div class="d-flex justify-content-center gap-3">
+                <form action="{{ url_for('remove_image') }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+
+                <form action="{{ url_for('upload_image') }}" method="POST" enctype="multipart/form-data">
+                    <label for="profile_image" class="btn btn-primary">Upload</label>
+                    <input type="file" class="form-control" id="profile_image" name="profile_image" hidden onchange="this.form.submit()">
+                    <div class="invalid-feedback d-block">{{ image_error }}</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="d-flex justify-content-center text-center my-4">
+        <div class="col-lg-3 justify-content-center">
+            <h3 class="fw-bold">{{ profile.first_name }} {{ profile.last_name }}</h3>
+            <h6>@{{ profile.username }}</h6>
+        </div>
+    </div>
+
+</section>
+
+<section class="container px-4 py-2">
+    <!-- Profile upadte success message -->
+    {% if profile_update_successful %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-6 mb-4 bg-success text-white border border-top-0 rounded-bottom text-center">
+            <div class="p-2">Your profile has been updated successfully!</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form id="userform" name="userform" action="/profile" method="post">
+        <input type="hidden" name="user_id" id="userid" class="form-control form-control-lg" value="{{profile['user_id']}}">
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 mb-3">
+                <label for="username" class="form-label">Username*</label>
+                <input type="text" class="form-control" id="username" name="username" value="{{ profile.username }}" readonly>
+                <div id="usernameHelp" class="form-text">Username can not be changed</div>
+            </div>
+            <div class="col-lg-3 mb-3">
+                <label for="useremail" class="form-label">Email*</label>
+                <input class="form-control{% if email_error %} is-invalid{% endif %}" type="text" id="email" name="email" value="{{ profile.email }}" required>
+                <div id="emailHelp" class="form-text">Max 320 characters.</div>
+                <div class="invalid-feedback">{{ email_error }}</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 mb-3">
+                <label for="firstname" class="form-label">First Name</label>
+                <input type="text" class="form-control{% if firstname_error %} is-invalid{% endif %}" id="first_name" name="first_name" value="{{ profile.first_name }}">
+                <div id="firstnameHelp" class="form-text">Max 50 characters</div>
+                <div class="invalid-feedback d-block">{{ firstname_error }}</div>
+            </div>
+
+            <div class="col-lg-3 mb-3">
+                <label for="lastname" class="form-label">Last Name</label>
+                <input type="text" class="form-control{% if lastname_error %} is-invalid{% endif %}" id="last_name" name="last_name" value="{{ profile.last_name }}">
+                <div id="lastnameHelp" class="form-text">Max 50 characters</div>
+                <div class="invalid-feedback d-block">{{ lastname_error }}</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control{% if location_error %} is-invalid{% endif %}" id="location" name="location" value="{{ profile.location }}">
+                <div id="locationHelp" class="form-text">Max 50 characters</div>
+                <div class="invalid-feedback">{{ location_error }}</div>
+            </div>
+            
+            <div class="col-lg-3 mb-3">
+                <label for="personal_description" class="form-label">Personal Description</label>
+                <textarea id="personal_description" name="personal_description" class="form-control{% if personal_description_error %} is-invalid{% endif %}">{{ profile.personal_description }}</textarea>
+                <div class="invalid-feedback">{{ personal_description_error }}</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 my-4 text-center">
+                    <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary btn-lg me-2 my-3">Change Password</a>
+                    <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-lg me-2">Cancel</a>
+                    <input type="submit" class="btn btn-primary btn-lg" value="Save"/>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 my-2 text-center">
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

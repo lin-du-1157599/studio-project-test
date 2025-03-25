@@ -1,0 +1,90 @@
+{% extends 'userbase.html' %}
+
+{% block title %}{% if event %}Edit Event{% else %}Add New Event{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">{% if event %}Edit Event{% else %}Add New Event{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="eventForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title*</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ event.title if event else '' }}" required
+                                   maxlength="100">
+                            <div class="form-text">Required, max 100 characters</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3">{{ event.description if event else '' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="start_time" class="form-label">Start Date & Time*</label>
+                                <input type="datetime-local" class="form-control" id="start_time" 
+                                       name="start_time" required
+                                       value="{{ event.start_time.strftime('%Y-%m-%dT%H:%M') if event else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="end_time" class="form-label">End Date & Time</label>
+                                <input type="datetime-local" class="form-control" id="end_time" 
+                                       name="end_time"
+                                       value="{{ event.end_time.strftime('%Y-%m-%dT%H:%M') if event and event.end_time else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location*</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ event.location if event else '' }}" required
+                                   maxlength="100">
+                            <div class="form-text">Required, max 100 characters</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="event_image" class="form-label">Event Image</label>
+                            {% if event and event.event_image %}
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + event.event_image) }}" 
+                                     class="img-thumbnail" style="max-height: 200px;" alt="Current event image">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="event_image" name="event_image" 
+                                   accept="image/*">
+                            <div class="form-text">Optional, will replace existing image if provided</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('view_events', journey_id=journey.journey_id) }}" 
+                               class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if event %}Save Changes{% else %}Add Event{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('eventForm').addEventListener('submit', function(e) {
+    const startTime = new Date(document.getElementById('start_time').value);
+    const endTime = new Date(document.getElementById('end_time').value);
+    
+    if (endTime && endTime < startTime) {
+        e.preventDefault();
+        alert('End time must be later than start time');
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,41 @@
+{% extends 'userbase.html' %}
+
+{% block title %}Admin Home{% endblock %}
+
+{# Set the active page to be highlighted in the navigation bar. #}
+{% set active_page = 'home' %}
+
+{% block content %}
+<section class="container pt-2 text-center">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <h1 class="text-center py-2">Admin</h1>
+            <p class="text-center py-4">Welcome to Admin Home Page.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-sm-4 p-4">
+            <div class="card p-4">
+                <div class="card-body">
+                    <h4 class="card-title">👥 All Users Details</h4>
+                    <p class="card-text">Manage and view all users.</p>
+                    <a href="{{ url_for('all_users') }}" class="btn btn-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-sm-4 p-4">
+            <div class="card p-4">
+                <div class="card-body">
+                    <h4 class="card-title">👥 Admin/Edit Users Details</h4>
+                    <p class="card-text">Manage and view admin/edit users.</p>
+                    <a href="{{ url_for('system_users') }}" class="btn btn-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
